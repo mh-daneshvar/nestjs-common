@@ -1,13 +1,15 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
+import { ControllerResponse } from './common/response-decorator/responses.interface';
 
 @Controller()
 export class AppController {
-  // eslint-disable-next-line no-unused-vars
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  async getHello(): Promise<ControllerResponse> {
+    return {
+      data: this.appService.getHello(),
+    };
   }
 }
