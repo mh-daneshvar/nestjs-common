@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ResponseDecorator } from './common/response-decorator/responseDecorator.interceptor';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,6 +13,13 @@ async function bootstrap() {
 
   // Exception Handler
   app.useGlobalFilters(new HttpExceptionFilter());
+
+  // Validation
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
 
   // Load ConfigService
   const servicePort = app.get(ConfigService).get<string>('SERVICE_PORT');
