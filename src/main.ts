@@ -2,9 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ResponseDecorator } from './common/response-decorator/responseDecorator.interceptor';
 import { ConfigService } from '@nestjs/config';
-import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
+import { HttpExceptionFilter } from './common/exceptions/httpException.filter';
 import { ValidationPipe } from '@nestjs/common';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -25,19 +24,7 @@ async function bootstrap() {
   // Load ConfigService
   const servicePort = app.get(ConfigService).get<string>('SERVICE_PORT');
 
-  // microservice #1
-  await app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,
-    options: {
-      urls: ['amqp://admin:admin@localhost:5672/sigma'],
-      queue: 'cats_queue',
-      queueOptions: {
-        durable: true,
-      },
-    },
-  });
-
-  await app.startAllMicroservices();
+  // Listen to the port
   await app.listen(servicePort);
 }
 

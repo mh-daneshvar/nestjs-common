@@ -2,13 +2,13 @@ import {
   CacheInterceptor,
   Controller,
   Get,
-  Inject,
+  // Inject,
   UseInterceptors,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ControllerResponse } from './common/response-decorator/responses.interface';
 import {
-  ClientProxy,
+  // ClientProxy,
   Ctx,
   EventPattern,
   MessagePattern,
@@ -19,14 +19,12 @@ import {
 @Controller()
 export class AppController {
   constructor(
-    private readonly appService: AppService,
-    @Inject('MATH_SERVICE') private readonly client: ClientProxy,
+    private readonly appService: AppService, // @Inject('MATH_SERVICE') private readonly client: ClientProxy,
   ) {}
 
   @Get()
   @UseInterceptors(CacheInterceptor)
   async getHello(): Promise<ControllerResponse> {
-    // this.client.emit('hello', 'fuck this world');
     return {
       data: {
         hello: await this.appService.getHello(),
