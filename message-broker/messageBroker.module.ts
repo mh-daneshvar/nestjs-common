@@ -8,21 +8,15 @@ const ConnectionFactory = {
   useFactory: async (
     configService: ConfigService,
   ): Promise<MessageBrokerInterface> => {
-    const configName = 'MESSAGE_BROKER';
-    let requestedMessageBroker = configService.get<string>(configName);
-    let messageBroker = null;
-    if (requestedMessageBroker) {
-      requestedMessageBroker = requestedMessageBroker.toLowerCase();
-      if (requestedMessageBroker === 'rabbitmq') {
-        messageBroker = new RabbitmqService(configService);
-        await messageBroker.setup();
-      } else {
-        throw new InternalServerErrorException(
-          `Check the value of the '${configName}' configuration attribute`,
-        );
-      }
+    const messageBroker = (
+      configService.get<string>('MESSAGE_BROKER') || ''
+    ).toLowerCase();
+    if (messageBroker === 'rabbitmq') {
+      return await new RabbitmqService(configService).setup();
     }
-    return messageBroker;
+    throw new InternalServerErrorException(
+      `Check the value of the 'MESSAGE_BROKER' configuration attribute`,
+    );
   },
   inject: [ConfigService],
 };

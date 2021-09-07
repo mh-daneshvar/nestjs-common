@@ -30,7 +30,7 @@ export default class RabbitmqService implements MessageBrokerInterface {
    *
    * @private
    */
-  public async setup() {
+  public async setup(): Promise<MessageBrokerInterface> {
     // Connect to RabbitMQ instance
     this.connection = await amqplib.connect(this.rabbitAddress);
 
@@ -63,7 +63,7 @@ export default class RabbitmqService implements MessageBrokerInterface {
       });
     }
 
-    console.log('Setup DONE');
+    return this;
   }
 
   /**
