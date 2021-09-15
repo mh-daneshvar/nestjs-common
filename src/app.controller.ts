@@ -6,7 +6,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ControllerResponse } from './common/response-decorator/responses.interface';
+import { ControllerResponse } from './common-2/response-decorator/responses.interface';
 import {
   // ClientProxy,
   Ctx,

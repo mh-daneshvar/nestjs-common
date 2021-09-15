@@ -2,7 +2,7 @@ import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { MessageBrokerModule } from './common/message-broker/messageBroker.module';
+import { MessageBrokerModule } from './common-2/message-broker/messageBroker.module';
 
 @Module({
   imports: [

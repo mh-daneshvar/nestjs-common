@@ -1,8 +1,8 @@
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import Exchanges from './common/message-broker/strategies/rabbitmq/constants/exchanges';
-import Queues from './common/message-broker/strategies/rabbitmq/constants/queues';
-import MessageBrokerInterface from './common/message-broker/MessageBroker.interface';
+import Exchanges from './common-2/message-broker/strategies/rabbitmq/constants/exchanges';
+import Queues from './common-2/message-broker/strategies/rabbitmq/constants/queues';
+import MessageBrokerInterface from './common-2/message-broker/MessageBroker.interface';
 
 @Injectable()
 export class AppService {
