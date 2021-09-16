@@ -7,3 +7,7 @@ good resource:
 update service with the last version of "master"
 
 ```git pull -s subtree common master```
+
+update subtree from the main project
+
+```git push common `git subtree split --prefix=src/common`:master --force```
