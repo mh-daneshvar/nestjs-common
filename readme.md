@@ -10,4 +10,4 @@ update service with the last version of "master"
 
 update subtree from the main project
 
-```git push origin `git subtree split --prefix=src/common`:master --force```
+```git push common `git subtree split --prefix=src/common`:master --force```
