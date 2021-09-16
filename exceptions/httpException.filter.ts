@@ -3,8 +3,8 @@ import {
   Catch,
   ArgumentsHost,
   HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+  HttpStatus
+}                            from '@nestjs/common';
 import { Request, Response } from 'express';
 
 @Catch(HttpException)
@@ -29,8 +29,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
         path: request.url,
         statusCode,
         timestamp: new Date().toISOString(),
-        details: (exception['response'] || {})['message'] || {},
-      },
+        details: (exception['response'] || {})['message'] || {}
+      }
     });
   }
 }
