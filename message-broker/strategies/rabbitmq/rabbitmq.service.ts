@@ -27,6 +27,7 @@ export default class RabbitmqService implements MessageBrokerInterface {
   }
 
   /**
+   * Setup exchanges and queues
    *
    * @private
    */
