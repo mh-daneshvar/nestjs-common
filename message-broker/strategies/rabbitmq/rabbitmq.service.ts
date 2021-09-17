@@ -79,15 +79,10 @@ export default class RabbitmqService implements MessageBrokerInterface {
     messageContent: string,
   ) {
     const channel = await this.connection.createChannel();
-    channel.publish(
-      exchangeName + '12',
-      routingKey,
-      Buffer.from(messageContent),
-      {
-        contentType: 'application/json',
-        persistent: true,
-      },
-    );
+    channel.publish(exchangeName, routingKey, Buffer.from(messageContent), {
+      contentType: 'application/json',
+      persistent: true,
+    });
     await channel.close();
   }
 }
