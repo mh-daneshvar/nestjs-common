@@ -3,26 +3,21 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import RedisService from './connections/redis.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configService } from '../../config.service';
+import { MongooseModule } from '@nestjs/mongoose';
 
-const ConnectionFactory = (type: 'redis' | 'postgres') => {
+const connectionFactory = (types: string[]) => {
   let redisInstance = null;
-  let postgresInstance = null;
-  if (type === 'redis') {
+  if (types.includes('redis')) {
     redisInstance = RedisService.getClient();
-  } else if (type === 'postgres') {
-    postgresInstance = 'postgres instance';
   }
 
   return {
     provide: 'DatabaseConnectionProvider',
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     useFactory: async (configService: ConfigService): Promise<any> => {
-      configService.get<string>('DATABASE_PORT');
       return {
         getRedisInstance: () => {
           return redisInstance;
-        },
-        getPostgresInstance: () => {
-          return postgresInstance;
         },
       };
     },
@@ -32,14 +27,21 @@ const ConnectionFactory = (type: 'redis' | 'postgres') => {
 
 @Module({})
 export class DatabaseModule {
-  static register(type: 'redis' | 'postgres'): DynamicModule {
-    const providers = [ConnectionFactory(type)];
+  static register(types: string[]): DynamicModule {
+    const ConnectionFactory = connectionFactory(types);
+    const providers = [ConnectionFactory];
+
+    const imports: any[] = [ConfigModule];
+    if (types.includes('postgres')) {
+      imports.push(TypeOrmModule.forRoot(configService.getTypeOrmConfig()));
+    }
+    if (types.includes('mongodb')) {
+      imports.push(MongooseModule.forRoot(configService.getMongoConfig()));
+    }
+
     return {
       module: DatabaseModule,
-      imports: [
-        ConfigModule,
-        TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
-      ],
+      imports,
       providers,
       exports: ['DatabaseConnectionProvider'],
     };

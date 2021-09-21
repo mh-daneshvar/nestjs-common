@@ -21,9 +21,7 @@ export default class RedisService {
 
       // Log a message when connection had been established successfully
       redisClient.on('connect', function () {
-        // TODO:
-        // We can do something in this section, but at this time we don't need
-        // RedisService.logger.log('Connected to Redis Successfully');
+        RedisService.logger.log('Connected to Redis Successfully');
       });
 
       // Log occurred-error when we have any connection-issue
