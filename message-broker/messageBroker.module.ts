@@ -11,12 +11,14 @@ const ConnectionFactory = {
     const messageBroker = (
       configService.get<string>('MESSAGE_BROKER') || ''
     ).toLowerCase();
-    if (messageBroker === 'rabbitmq') {
-      return await new RabbitmqService(configService).setup();
+    if (messageBroker) {
+      if (messageBroker === 'rabbitmq') {
+        return await new RabbitmqService(configService).setup();
+      }
+      throw new InternalServerErrorException(
+        `Check the value of the 'MESSAGE_BROKER' configuration attribute`,
+      );
     }
-    throw new InternalServerErrorException(
-      `Check the value of the 'MESSAGE_BROKER' configuration attribute`,
-    );
   },
   inject: [ConfigService],
 };

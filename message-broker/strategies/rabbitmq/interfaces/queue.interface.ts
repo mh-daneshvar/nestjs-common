@@ -1,10 +1,10 @@
 export default interface QueueInterface {
+  exchangeName: string;
   name: string;
   bindingKey: string;
   durable: boolean;
   noAck: boolean;
   exclusive: boolean;
   auto_delete: boolean;
-  exchangeName: string;
-  handler: any;
+  handler: (message: any) => any;
 }

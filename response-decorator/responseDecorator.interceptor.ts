@@ -30,7 +30,7 @@ export class ResponseDecorator<T>
     next: CallHandler,
   ): Observable<Promise<unknown>> {
     return next.handle().pipe(
-      map(async (controllerResponse: ControllerResponse): Promise<void> => {
+      map(async (controllerResponse: ControllerResponse): Promise<any> => {
         // Extract request and response from the context
         const request = context.switchToHttp().getRequest();
         const response = context.switchToHttp().getResponse();
@@ -61,7 +61,9 @@ export class ResponseDecorator<T>
 
         // Modify the response
         response.statusCode = httpStatus;
-        response.json({
+
+        // Return response
+        return {
           status,
           message,
           data,
@@ -69,7 +71,7 @@ export class ResponseDecorator<T>
           page,
           limit,
           links,
-        });
+        };
       }),
     );
   }
