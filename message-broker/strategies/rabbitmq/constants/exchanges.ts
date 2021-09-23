@@ -1,6 +1,6 @@
 const Exchanges = {
   processing: {
-    name: 'processing',
+    name: 'messageBus',
     type: 'direct',
     durable: true,
   },

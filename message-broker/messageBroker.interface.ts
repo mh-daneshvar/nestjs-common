@@ -1,4 +1,6 @@
+import { PublishingQueueInterface } from './strategies/rabbitmq/interfaces/queue.interface';
+
 export default interface MessageBrokerInterface {
   setup();
-  publish(exchangeName: string, routingKey: string, messageContent: any);
+  publish(publishingQueue: PublishingQueueInterface, messageContent: any);
 }

@@ -3,8 +3,11 @@ import Exchanges from './constants/exchanges';
 import Queues from './constants/queues';
 import { ConfigService } from '@nestjs/config';
 import MessageBrokerInterface from '../../MessageBroker.interface';
-import QueueInterface from './interfaces/queue.interface';
 import ExchangeInterface from './interfaces/exchange.interface';
+import {
+  ListeningQueueInterface,
+  PublishingQueueInterface,
+} from './interfaces/queue.interface';
 
 export default class RabbitmqService implements MessageBrokerInterface {
   private connection: amqplib.Connection;
@@ -12,7 +15,8 @@ export default class RabbitmqService implements MessageBrokerInterface {
   private readonly configs: {
     rabbitAddress: string;
     exchanges: ExchangeInterface[];
-    queues: QueueInterface[];
+    listeningQueues: ListeningQueueInterface[];
+    publishingQueues: PublishingQueueInterface[];
   };
 
   /**
@@ -29,7 +33,12 @@ export default class RabbitmqService implements MessageBrokerInterface {
       exchanges: Object.getOwnPropertyNames(Exchanges).map(
         (exchange) => Exchanges[exchange],
       ),
-      queues: Object.getOwnPropertyNames(Queues).map((queue) => Queues[queue]),
+      listeningQueues: Object.getOwnPropertyNames(Queues.listening).map(
+        (queue) => Queues.listening[queue],
+      ),
+      publishingQueues: Object.getOwnPropertyNames(Queues.publishing).map(
+        (queue) => Queues.publishing[queue],
+      ),
     };
   }
 
@@ -52,32 +61,28 @@ export default class RabbitmqService implements MessageBrokerInterface {
       });
     }
 
-    // 4. Setup queues
-    for (const queueInfo of this.configs.queues) {
-      const queueCompleteName = `${queueInfo.exchangeName}.${queueInfo.name}`;
-      // Setup the queue
-      await channel.assertQueue(queueCompleteName, {
-        durable: queueInfo.durable,
-      });
-      // Bind the queue to the given exchange
-      await channel.bindQueue(
-        queueCompleteName,
-        queueInfo.exchangeName,
-        queueInfo.bindingKey,
-      );
+    // 4. Setup listeners
+    for (const queueInfo of this.configs.listeningQueues) {
+      const { name, handler } = queueInfo;
+
       // Subscribe on the queue and register the handler
-      await channel.consume(
-        queueCompleteName,
-        async function (message) {
-          try {
-            await queueInfo.handler(message);
-            channel.ack(message);
-          } catch (e) {}
-        },
-        {
-          noAck: queueInfo.noAck,
-        },
-      );
+      await channel.consume(name, async function (message) {
+        try {
+          await handler(message);
+          channel.ack(message);
+        } catch (e) {}
+      });
+    }
+
+    // 5. Setup publishers
+    for (const queueInfo of this.configs.publishingQueues) {
+      const { name, routingKey, exchangeName } = queueInfo;
+
+      // Setup the queue
+      await channel.assertQueue(name);
+
+      // Bind the queue to the given exchange
+      await channel.bindQueue(name, exchangeName, routingKey);
     }
 
     return this;
@@ -86,27 +91,24 @@ export default class RabbitmqService implements MessageBrokerInterface {
   /**
    * Use this method for publishing new message in the given queue
    *
-   * @param exchangeName
-   * @param routingKey
+   * @param publishingQueue
    * @param messageContent
    */
   public async publish(
-    exchangeName: string,
-    routingKey: string,
-    messageContent: string,
+    publishingQueue: PublishingQueueInterface,
+    messageContent: Record<string, unknown>,
   ) {
     const channel = await this.connection.createChannel();
-    await channel.assertQueue('processing.requests', {
-      durable: true,
-    });
-    channel.sendToQueue(
-      'processing.requests',
+    const { exchangeName, routingKey, persistent } = publishingQueue;
+    channel.publish(
+      exchangeName,
+      routingKey,
       Buffer.from(messageContent.toString()),
       {
         contentType: 'application/json',
-        persistent: true,
+        persistent,
       },
     );
-    // await channel.close();
+    await channel.close();
   }
 }
