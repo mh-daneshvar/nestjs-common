@@ -30,14 +30,10 @@ export default class RabbitmqService implements MessageBrokerInterface {
   constructor(configService: ConfigService) {
     this.configs = {
       rabbitAddress: configService.get<string>('RABBITMQ_SERVER_ADDRESS'),
-      exchanges: Object.getOwnPropertyNames(Exchanges).map(
-        (exchange) => Exchanges[exchange],
-      ),
-      listeningQueues: Object.getOwnPropertyNames(Queues.listening).map(
-        (queue) => Queues.listening[queue],
-      ),
-      publishingQueues: Object.getOwnPropertyNames(Queues.publishing).map(
-        (queue) => Queues.publishing[queue],
+      exchanges: Exchanges.filter((exchange) => exchange.name),
+      listeningQueues: Queues.listening.filter((queue) => queue && queue.name),
+      publishingQueues: Queues.publishing.filter(
+        (queue) => queue && queue.name,
       ),
     };
   }
@@ -91,24 +87,37 @@ export default class RabbitmqService implements MessageBrokerInterface {
   /**
    * Use this method for publishing new message in the given queue
    *
-   * @param publishingQueue
+   * @param routingKey
    * @param messageContent
+   * @param exchangeName
    */
   public async publish(
-    publishingQueue: PublishingQueueInterface,
+    routingKey: string,
     messageContent: Record<string, unknown>,
+    exchangeName?: string,
   ) {
     const channel = await this.connection.createChannel();
-    const { exchangeName, routingKey, persistent } = publishingQueue;
-    channel.publish(
-      exchangeName,
-      routingKey,
-      Buffer.from(messageContent.toString()),
-      {
-        contentType: 'application/json',
-        persistent,
-      },
-    );
-    await channel.close();
+
+    const publishingQueues = this.configs.publishingQueues.filter((queue) => {
+      if (exchangeName && queue.name === routingKey) {
+        return true;
+      } else if (queue.name === routingKey) {
+        return true;
+      }
+    });
+
+    for (const publishingQueue of publishingQueues) {
+      const { exchangeName, routingKey, persistent } = publishingQueue;
+      channel.publish(
+        exchangeName,
+        routingKey,
+        Buffer.from(JSON.stringify(messageContent)),
+        {
+          contentType: 'application/json',
+          persistent,
+        },
+      );
+      await channel.close();
+    }
   }
 }

@@ -1,6 +1,5 @@
 export interface ListeningQueueInterface {
   name: string;
-  bindingKey: string;
   exchangeName: string;
   handler: (message: any) => any;
 }

@@ -1,9 +1,9 @@
-const Exchanges = {
-  processing: {
+const Exchanges = [
+  {
     name: 'messageBus',
-    type: 'direct',
+    type: 'fanout',
     durable: true,
   },
-};
+];
 
 export default Exchanges;
