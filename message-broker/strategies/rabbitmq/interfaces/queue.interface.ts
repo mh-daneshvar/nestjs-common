@@ -1,16 +1,20 @@
 export interface ListeningQueueInterface {
-  name: string;
+  service: string;
+  event: string;
+  version: string;
   exchangeName: string;
   handler: (message: any) => any;
 }
 
 export interface PublishingQueueInterface {
-  name: string;
-  routingKey: string;
+  event: string;
+  version: string;
   exchangeName: string;
-  durable: boolean;
-  noAck: boolean;
-  exclusive: boolean;
-  auto_delete: boolean;
-  persistent: boolean;
+  configs: {
+    durable: boolean;
+    noAck: boolean;
+    exclusive: boolean;
+    auto_delete: boolean;
+    persistent: boolean;
+  };
 }

@@ -1,4 +1,9 @@
 export default interface MessageBrokerInterface {
   setup();
-  publish(routingKey: string, messageContent: any, exchangeName?: string);
+  publish(
+    event: string,
+    version: string,
+    messageContent: any,
+    exchangeName?: string,
+  );
 }

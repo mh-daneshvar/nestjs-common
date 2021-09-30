@@ -1,7 +1,7 @@
 const Exchanges = [
   {
-    name: 'messageBus',
-    type: 'fanout',
+    name: 'sigma-exchange',
+    type: 'topic',
     durable: true,
   },
 ];
