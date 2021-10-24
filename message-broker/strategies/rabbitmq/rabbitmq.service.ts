@@ -1,6 +1,6 @@
 import * as amqplib from 'amqplib';
-import Exchanges from './constants/exchanges';
-import Queues from './constants/queues';
+import Exchanges from './../../../../configs/message-broker/rabbitmq/exchanges';
+import Queues from './../../../../configs/message-broker/rabbitmq/queues';
 import { ConfigService } from '@nestjs/config';
 import MessageBrokerInterface from '../../MessageBroker.interface';
 import ExchangeInterface from './interfaces/exchange.interface';
